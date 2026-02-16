@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BAC Calculator">
+    <title>BAC Calculator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .disclaimer {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px;
+            border-radius: 5px;
+            font-size: 13px;
+            color: #856404;
+        }
+        .section { padding: 20px; }
+        .form-group { margin-bottom: 20px; }
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            color: #555;
+            font-size: 14px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+        .calc-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        .results {
+            padding: 20px;
+            background: #f8f9fa;
+            margin: 20px;
+            border-radius: 15px;
+            display: none;
+        }
+        .results.show { display: block; }
+        .bac-display {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .bac-value { font-size: 48px; font-weight: 700; margin-bottom: 10px; }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .info-value { 
+            font-size: 24px; 
+            font-weight: 700; 
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .info-label { font-size: 13px; color: #666; }
+        .effects-box {
+            background: #e8f4fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .effects-box h3 { 
+            color: #1976D2; 
+            margin-bottom: 10px; 
+            font-size: 16px;
+        }
+        .warning {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            display: none;
+        }
+        .warning.show { display: block; }
+        .warning h3 { color: #c62828; margin-bottom: 10px; font-size: 16px; }
+        @media (max-width: 480px) {
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍺 BAC Calculator</h1>
+            <p>Blood Alcohol Content Tracker</p>
+        </div>
+
+        <div class="disclaimer">
+            <strong>⚠️ Disclaimer:</strong> This calculator is for educational purposes only. 
+            Do not use it to determine fitness to drive or operate machinery.
+        </div>
+
+        <div class="section">
+            <h3 style="margin-bottom: 15px; color: #333;">Your Details</h3>
+            
+            <div class="form-group">
+                <label for="weight">Body Weight (kg)</label>
+                <input type="number" id="weight" step="0.1" min="1" placeholder="70">
+                <div class="hint">1 kg = 2.2 lbs (e.g., 70 kg = 154 lbs)</div>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender">
+                    <option value="">Select gender...</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+
+            <h3 style="margin: 20px 0 15px 0; color: #333;">Drink Information</h3>
+
+            <div class="form-group">
+                <label for="preset">Quick Presets</label>
+                <select id="preset">
+                    <option value="">Select a drink...</option>
+                    <option value="5,355">🍺 Beer (5%, 355ml)</option>
+                    <option value="12,150">🍷 Wine (12%, 150ml)</option>
+                    <option value="40,44">🥃 Shot (40%, 44ml)</option>
+                    <option value="7,355">🍺 IPA (7%, 355ml)</option>
+                    <option value="15,120">🍹 Cocktail (15%, 120ml)</option>
+                    <option value="5,355">💧 Hard Seltzer (5%, 355ml)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="alcohol">Alcohol Percentage (%)</label>
+                <input type="number" id="alcohol" step="0.1" min="0" max="100" placeholder="5">
+                <div class="hint">Beer: 4-7%, Wine: 10-15%, Spirits: 35-45%</div>
+            </div>
+
+            <div class="form-group">
+                <label for="volume">Volume (ml)</label>
+                <input type="number" id="volume" step="1" min="1" placeholder="355">
+                <div class="hint">Beer can: 355ml, Wine glass: 150ml, Shot: 44ml</div>
+            </div>
+
+            <div class="form-group">
+                <label for="time">Drinking Time (hours)</label>
+                <input type="number" id="time" step="0.1" min="0.1" value="0.5">
+                <div class="hint">How long it took to consume this drink</div>
+            </div>
+
+            <button class="calc-btn" id="calcBtn">Calculate BAC</button>
+        </div>
+
+        <div class="results" id="results">
+            <div class="bac-display">
+                <div class="bac-value" id="bacValue">0.000%</div>
+                <div>Current Blood Alcohol Content</div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-value" id="peakBac">0.00%</div>
+                    <div class="info-label">Peak BAC</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-value" id="peakTime">0.0h</div>
+                    <div class="info-label">Time to Peak</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-value" id="drinks">0.0</div>
+                    <div class="info-label">Standard Drinks</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-value" id="soberTime">0.0h</div>
+                    <div class="info-label">Hours Until Sober</div>
+                </div>
+            </div>
+
+            <div class="effects-box">
+                <h3>Expected Effects at Current BAC</h3>
+                <p id="effects">No noticeable effects</p>
+            </div>
+
+            <div class="warning" id="warning">
+                <h3>⚠️ Warning: Above Legal Limit</h3>
+                <p>Your BAC exceeds 0.08%. Do not drive or operate machinery.</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        (function() {
+            'use strict';
+            
+            var presetEl = document.getElementById('preset');
+            var alcoholEl = document.getElementById('alcohol');
+            var volumeEl = document.getElementById('volume');
+            var calcBtn = document.getElementById('calcBtn');
+            
+            // Preset handler
+            if (presetEl) {
+                presetEl.onchange = function() {
+                    var val = this.value;
+                    if (val) {
+                        var parts = val.split(',');
+                        if (parts.length === 2) {
+                            alcoholEl.value = parts[0];
+                            volumeEl.value = parts[1];
+                        }
+                    }
+                };
+            }
+            
+            // Calculate handler
+            if (calcBtn) {
+                calcBtn.onclick = function() {
+                    try {
+                        var weight = parseFloat(document.getElementById('weight').value);
+                        var gender = document.getElementById('gender').value;
+                        var alcohol = parseFloat(document.getElementById('alcohol').value);
+                        var volume = parseFloat(document.getElementById('volume').value);
+                        var drinkTime = parseFloat(document.getElementById('time').value);
+                        
+                        if (!weight || !gender || !alcohol || !volume || !drinkTime) {
+                            alert('Please fill in all fields!');
+                            return false;
+                        }
+                        
+                        // Widmark formula
+                        var r = gender === 'male' ? 0.68 : 0.55;
+                        var alcoholGrams = (alcohol / 100) * volume * 0.789;
+                        var peakBAC = (alcoholGrams / (r * weight * 1000)) * 100;
+                        var currentBAC = Math.max(0, peakBAC - (0.015 * drinkTime));
+                        var standardDrinks = alcoholGrams / 14;
+                        var hoursToSober = currentBAC / 0.015;
+                        
+                        // Update display
+                        document.getElementById('bacValue').textContent = currentBAC.toFixed(3) + '%';
+                        document.getElementById('peakBac').textContent = peakBAC.toFixed(3) + '%';
+                        document.getElementById('peakTime').textContent = drinkTime.toFixed(1) + 'h';
+                        document.getElementById('drinks').textContent = standardDrinks.toFixed(1);
+                        document.getElementById('soberTime').textContent = hoursToSober.toFixed(1) + 'h';
+                        
+                        // Effects
+                        var effects = 'No noticeable effects';
+                        if (currentBAC >= 0.40) effects = 'MEDICAL EMERGENCY: high risk of death';
+                        else if (currentBAC >= 0.30) effects = 'Severe intoxication, risk of passing out';
+                        else if (currentBAC >= 0.20) effects = 'Severe impairment, confusion, dizziness';
+                        else if (currentBAC >= 0.15) effects = 'Major impairment of motor skills';
+                        else if (currentBAC >= 0.10) effects = 'Significant impairment of coordination';
+                        else if (currentBAC >= 0.08) effects = 'Impairment of balance, speech, vision';
+                        else if (currentBAC >= 0.06) effects = 'Minor impairment of reasoning';
+                        else if (currentBAC >= 0.03) effects = 'Feeling of warmth and relaxation';
+                        else if (currentBAC >= 0.01) effects = 'Mild effects: mood elevation';
+                        
+                        document.getElementById('effects').textContent = effects;
+                        
+                        // Warning
+                        var warningEl = document.getElementById('warning');
+                        if (currentBAC >= 0.08) {
+                            warningEl.className = 'warning show';
+                        } else {
+                            warningEl.className = 'warning';
+                        }
+                        
+                        // Show results
+                        var resultsEl = document.getElementById('results');
+                        resultsEl.className = 'results show';
+                        
+                        // Scroll
+                        setTimeout(function() {
+                            resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+                        
+                    } catch (err) {
+                        alert('Error calculating BAC: ' + err.message);
+                    }
+                    
+                    return false;
+                };
+            }
+        })();
+    </script>
+</body>
+</html>
